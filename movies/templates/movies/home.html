@@ -1,0 +1,108 @@
+{% extends 'movies/base.html' %}
+
+{% block title %}Home - The Cinematic{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative h-[70vh] overflow-hidden">
+    <div class="hero-overlay absolute inset-0 z-10"></div>
+    <img src="https://via.placeholder.com/1920x1080/0a0e17/f59e0b?text=Featured+Movie" 
+         alt="Hero" 
+         class="w-full h-full object-cover">
+    <div class="absolute inset-0 z-20 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 w-full">
+            <div class="max-w-2xl">
+                <h2 class="text-6xl font-bold mb-4 gradient-text">Discover Cinema</h2>
+                <p class="text-xl text-slate-300 mb-8">
+                    Explore thousands of movies, rate your favorites, and get personalized recommendations.
+                </p>
+                <div class="flex gap-4">
+                    <a href="{% url 'browse' %}" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
+                        Browse Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trending Section -->
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+        <span class="text-4xl">🔥</span>
+        Trending Now
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <!--
+        {% for movie in trending_movies %} -->
+        <a href="{% url 'movie_detail' movie.id %}" class="movie-card group cursor-pointer relative overflow-hidden rounded-lg bg-slate-800">
+            <div class="aspect-[2/3] relative overflow-hidden">
+                {% if movie.poster %}
+                <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                {% else %}
+                <div class="w-full h-full bg-slate-700 flex items-center justify-center">
+                    <span class="text-slate-500">No Image</span>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <div class="flex items-center gap-2 text-sm text-amber-400">
+                        <svg class="w-4 h-4 fill-amber-400" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        <span>{{ movie.average_rating }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3">
+                <h3 class="font-semibold text-white truncate">{{ movie.title }}</h3>
+                <p class="text-sm text-slate-400">{{ movie.year }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Top Rated Section -->
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+        <svg class="w-8 h-8 text-amber-400 fill-amber-400" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+        Top Rated
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for movie in top_rated_movies %}
+        <a href="{% url 'movie_detail' movie.id %}" class="movie-card group cursor-pointer relative overflow-hidden rounded-lg bg-slate-800">
+            <div class="aspect-[2/3] relative overflow-hidden">
+                {% if movie.poster %}
+                <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                {% else %}
+                <div class="w-full h-full bg-slate-700 flex items-center justify-center">
+                    <span class="text-slate-500">No Image</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="p-3">
+                <h3 class="font-semibold text-white truncate">{{ movie.title }}</h3>
+                <p class="text-sm text-slate-400">{{ movie.year }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Recommended Section -->
+{% if not user.is_authenticated %}
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-4">Recommended for You</h2>
+    <p class="text-slate-400 mb-8">Sign in to get personalized recommendations</p>
+    <a href="{% url 'login' %}" class="inline-block px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-colors">
+        Get Started
+    </a>
+</div>
+{% endif %}
+{% endblock %}

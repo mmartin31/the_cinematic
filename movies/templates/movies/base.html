@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Cinematic{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'static/css/custom.css' %}">
+</head>
+<body class="bg-slate-950 text-white">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-8">
+                    <a href="{% url 'home' %}" class="text-2xl font-bold gradient-text flex items-center gap-2">
+                        <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                        </svg>
+                        The Cinematic
+                    </a>
+                    <div class="hidden md:flex gap-6">
+                        <a href="{% url 'home' %}" class="text-slate-300 hover:text-amber-400 transition-colors">Home</a>
+                        <a href="{% url 'browse' %}" class="text-slate-300 hover:text-amber-400 transition-colors">Browse</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                    <div class="hidden md:block relative">
+                        <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <span>{{ user.username }}</span>
+                        </button>
+                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden">
+                            <a href="{% url 'profile' %}" class="block px-4 py-3 hover:bg-slate-700 transition-colors">Profile</a>
+                            <a href="{% url 'logout' %}" class="block px-4 py-3 hover:bg-slate-700 transition-colors text-red-400">Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-black font-semibold transition-colors">Sign In</a>
+                    {% endif %}
+                    
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 py-4">
+        {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded-lg {% if message.tags == 'error' %}bg-red-900 border border-red-700{% else %}bg-green-900 border border-green-700{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg md:hidden">
+        <div class="p-4">
+            <button onclick="toggleMobileMenu()" class="mb-8">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <div class="space-y-4">
+                <a href="{% url 'home' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Home</a>
+                <a href="{% url 'browse' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Browse</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Profile</a>
+                <a href="{% url 'logout' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-amber-400">The Cinematic</h3>
+                    <p class="text-slate-400 text-sm">Your ultimate destination for movie discovery and ratings.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Explore</h4>
+                    <div class="space-y-2 text-slate-400 text-sm">
+                        <a href="{% url 'browse' %}" class="block hover:text-white transition-colors">Browse</a>
+                        <a href="{% url 'home' %}" class="block hover:text-white transition-colors">Top Rated</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Account</h4>
+                    <div class="space-y-2 text-slate-400 text-sm">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="block hover:text-white transition-colors">Profile</a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="block hover:text-white transition-colors">Sign In</a>
+                        <a href="{% url 'signup' %}" class="block hover:text-white transition-colors">Sign Up</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="space-y-2 text-slate-400 text-sm">
+                        <a href="#" class="block hover:text-white transition-colors">Twitter</a>
+                        <a href="#" class="block hover:text-white transition-colors">Instagram</a>
+                        <a href="#" class="block hover:text-white transition-colors">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-slate-800 text-center text-slate-400 text-sm">
+                © 2024 The Cinematic. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{% extends 'movies/base.html' %}
+
+{% block title %}Browse Movies - The Cinematic{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Search Bar -->
+        <form method="get" class="mb-8">
+            <div class="relative">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search_query }}"
+                    placeholder="Search movies..."
+                    class="w-full pl-12 pr-4 py-4 bg-slate-900 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                >
+            </div>
+
+            <!-- Filters -->
+            <div class="mt-6 space-y-4">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-400 mb-3">Genre</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="genre" value="" class="px-4 py-2 rounded-full text-sm transition-all duration-200 {% if not selected_genre %}bg-amber-500 text-black font-semibold{% else %}bg-slate-800 text-slate-300 hover:bg-slate-700{% endif %}">
+                            All
+                        </button>
+                        {% for genre in genres %}
+                        <button type="submit" name="genre" value="{{ genre.name }}" class="px-4 py-2 rounded-full text-sm transition-all duration-200 {% if selected_genre == genre.name %}bg-amber-500 text-black font-semibold{% else %}bg-slate-800 text-slate-300 hover:bg-slate-700{% endif %}">
+                            {{ genre.name }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-400 mb-3">Year</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="year" value="" class="px-4 py-2 rounded-full text-sm transition-all duration-200 {% if not selected_year %}bg-amber-500 text-black font-semibold{% else %}bg-slate-800 text-slate-300 hover:bg-slate-700{% endif %}">
+                            All Years
+                        </button>
+                        {% for year in years %}
+                        <button type="submit" name="year" value="{{ year }}" class="px-4 py-2 rounded-full text-sm transition-all duration-200 {% if selected_year|stringformat:'s' == year|stringformat:'s' %}bg-amber-500 text-black font-semibold{% else %}bg-slate-800 text-slate-300 hover:bg-slate-700{% endif %}">
+                            {{ year }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results -->
+        <div class="mb-4 text-slate-400">
+            {{ movies.count }} movie{{ movies.count|pluralize }} found
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {% for movie in movies %}
+            <a href="{% url 'movie_detail' movie.id %}" class="movie-card group cursor-pointer relative overflow-hidden rounded-lg bg-slate-800">
+                <div class="aspect-[2/3] relative overflow-hidden">
+                    {% if movie.poster %}
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    {% else %}
+                    <div class="w-full h-full bg-slate-700 flex items-center justify-center">
+                        <span class="text-slate-500">No Image</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="p-3">
+                    <h3 class="font-semibold text-white truncate">{{ movie.title }}</h3>
+                    <p class="text-sm text-slate-400">{{ movie.year }}</p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full text-center py-16">
+                <p class="text-slate-400 text-lg">No movies found matching your criteria</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

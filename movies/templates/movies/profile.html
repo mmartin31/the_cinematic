@@ -1,0 +1,107 @@
+{% extends 'movies/base.html' %}
+
+{% block title %}Profile - The Cinematic{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-r from-amber-500/20 to-cyan-500/20 rounded-2xl p-8 mb-12 border border-amber-500/30">
+            <div class="flex items-center gap-6">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-4xl font-bold text-black">
+                    {{ user.username|first|upper }}
+                </div>
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">{{ user.username }}</h1>
+                    <p class="text-slate-400">Member since {{ profile.joined_date|date:"Y" }}</p>
+                    <div class="flex gap-6 mt-4">
+                        <div>
+                            <div class="text-2xl font-bold text-amber-400">{{ total_ratings }}</div>
+                            <div class="text-sm text-slate-400">Movies Rated</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-amber-400">{{ average_rating }}</div>
+                            <div class="text-sm text-slate-400">Avg Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Movies -->
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <svg class="w-8 h-8 text-amber-400 fill-amber-400" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Your Top Movies
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                {% for rating in top_rated %}
+                <div class="relative">
+                    <div class="absolute -top-3 -left-3 z-10 w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-black font-bold text-lg shadow-lg">
+                        {{ forloop.counter }}
+                    </div>
+                    <a href="{% url 'movie_detail' rating.movie.id %}" class="movie-card group cursor-pointer relative overflow-hidden rounded-lg bg-slate-800 block">
+                        <div class="aspect-[2/3] relative overflow-hidden">
+                            {% if rating.movie.poster %}
+                            <img src="{{ rating.movie.poster.url }}" alt="{{ rating.movie.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            {% else %}
+                            <div class="w-full h-full bg-slate-700"></div>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-white truncate">{{ rating.movie.title }}</h3>
+                            <p class="text-sm text-slate-400">{{ rating.movie.year }}</p>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-8 text-slate-400">
+                    No 5-star ratings yet. Start rating movies!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- All Rated Movies -->
+        <div>
+            <h2 class="text-3xl font-bold mb-8">All Your Ratings</h2>
+            <div class="space-y-4">
+                {% for rating in rated_movies %}
+                <div class="bg-slate-900 rounded-lg p-6 flex items-center gap-6 hover:bg-slate-800 transition-colors">
+                    {% if rating.movie.poster %}
+                    <img src="{{ rating.movie.poster.url }}" alt="{{ rating.movie.title }}" class="w-20 h-30 object-cover rounded">
+                    {% else %}
+                    <div class="w-20 h-30 bg-slate-700 rounded"></div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <a href="{% url 'movie_detail' rating.movie.id %}" class="text-xl font-semibold mb-1 hover:text-amber-400 transition-colors">{{ rating.movie.title }}</a>
+                        <p class="text-slate-400">{{ rating.movie.year }}</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex gap-1">
+                            {% for i in "12345" %}
+                            <svg class="w-6 h-6 {% if forloop.counter <= rating.rating %}text-amber-400 fill-amber-400{% else %}text-slate-600{% endif %}" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'delete_rating' rating.id %}" onclick="return confirm('Delete this rating?')" class="px-4 py-2 bg-transparent hover:bg-slate-700 text-red-400 border border-slate-700 rounded-lg transition-colors">
+                            Remove
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-16">
+                    <p class="text-slate-400 text-lg mb-4">You haven't rated any movies yet</p>
+                    <a href="{% url 'browse' %}" class="inline-block px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-colors">
+                        Start Rating
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
