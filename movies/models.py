@@ -10,24 +10,56 @@ class Genre(models.Model):
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=200)
-    year = models.IntegerField()
+    poster_link = models.URLField(blank=True, null=True)
+    series_title = models.CharField(max_length=200)
+    released_year = models.IntegerField()
     runtime = models.IntegerField(help_text="Runtime in minutes")
+    genres = models.ManyToManyField(Genre, related_name='movies')
     overview = models.TextField()
-    poster = models.ImageField(upload_to='posters/', blank=True, null=True)
+    director = models.CharField(max_length=200)
+    star1 = models.CharField(max_length=100)
+    star2 = models.CharField(max_length=100, blank=True, null=True)
+    star3 = models.CharField(max_length=100, blank=True, null=True)
+    star4 = models.CharField(max_length=100, blank=True, null=True)
+    gross = models.BigIntegerField(blank=True, null=True)
     backdrop = models.ImageField(upload_to='backdrops/', blank=True, null=True)
-    release_date = models.DateField()
-    genres = models.ManyToManyField(Genre, related_name='movies', blank=True)
     tmdb_id = models.IntegerField(unique=True, null=True, blank=True)
     average_rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-year', 'title']
+        ordering = ['-released_year', 'series_title']
 
     def __str__(self):
-        return f"{self.title} ({self.year})"
+        return f"{self.series_title} ({self.released_year})"
+
+    @property
+    def title(self):
+        """Alias for templates/admin expecting `title`."""
+        return self.series_title
+
+    @property
+    def year(self):
+        """Alias for templates/admin expecting `year`."""
+        return self.released_year
+
+    @property
+    def poster(self):
+        """Return an object with `.url` to support templates that expect `movie.poster.url`.
+
+        If `poster_link` is set, return a small proxy with a `url` attribute. If an ImageField
+        `backdrop` is present, return that (it already provides `.url`). Otherwise return None.
+        """
+        if self.poster_link:
+            class _PosterProxy:
+                def __init__(self, url):
+                    self.url = url
+
+            return _PosterProxy(self.poster_link)
+        if self.backdrop:
+            return self.backdrop
+        return None
 
     def update_average_rating(self):
         """Calculate and update the average rating"""

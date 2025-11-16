@@ -39,12 +39,12 @@ def browse(request):
         movies = movies.filter(genres__name=genre_filter)
     
     # Year filter
-    year_filter = request.GET.get('year', '')
+    year_filter = request.GET.get('released_year', '')
     if year_filter:
         movies = movies.filter(year=year_filter)
     
     # Get unique years for filter
-    years = Movie.objects.values_list('year', flat=True).distinct().order_by('-year')
+    years = Movie.objects.values_list('released_year', flat=True).distinct().order_by('-released_year')
     
     context = {
         'movies': movies,

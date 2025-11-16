@@ -3,9 +3,9 @@ from .models import Movie, Genre, Cast, Rating, UserProfile
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'year', 'average_rating', 'created_at')
-    list_filter = ('year', 'genres')
-    search_fields = ('title', 'overview')
+    list_display = ('series_title', 'released_year', 'average_rating', 'created_at')
+    list_filter = ('released_year', 'genres')
+    search_fields = ('series_title', 'overview')
     filter_horizontal = ('genres',)
 
 @admin.register(Genre)
