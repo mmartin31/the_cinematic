@@ -1,3 +1,6 @@
+<!-- ============================================ -->
+<!-- movies/templates/movies/base.html -->
+<!-- ============================================ -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}The Cinematic{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'static/css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 </head>
 <body class="bg-slate-950 text-white">
     <!-- Navigation -->
@@ -23,6 +26,7 @@
                     <div class="hidden md:flex gap-6">
                         <a href="{% url 'home' %}" class="text-slate-300 hover:text-amber-400 transition-colors">Home</a>
                         <a href="{% url 'browse' %}" class="text-slate-300 hover:text-amber-400 transition-colors">Browse</a>
+                        <a href="{% url 'top_rated' %}" class="text-slate-300 hover:text-amber-400 transition-colors">Top Rated</a>
                     </div>
                 </div>
                 
@@ -34,10 +38,23 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                             <span>{{ user.username }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </button>
                         <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden">
-                            <a href="{% url 'profile' %}" class="block px-4 py-3 hover:bg-slate-700 transition-colors">Profile</a>
-                            <a href="{% url 'logout' %}" class="block px-4 py-3 hover:bg-slate-700 transition-colors text-red-400">Logout</a>
+                            <a href="{% url 'profile' %}" class="block px-4 py-3 hover:bg-slate-700 transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                Profile
+                            </a>
+                            <a href="{% url 'logout' %}" class="block px-4 py-3 hover:bg-slate-700 transition-colors flex items-center gap-2 text-red-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Logout
+                            </a>
                         </div>
                     </div>
                     {% else %}
@@ -76,6 +93,7 @@
             <div class="space-y-4">
                 <a href="{% url 'home' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Home</a>
                 <a href="{% url 'browse' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Browse</a>
+                <a href="{% url 'top_rated' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Top Rated</a>
                 {% if user.is_authenticated %}
                 <a href="{% url 'profile' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Profile</a>
                 <a href="{% url 'logout' %}" class="block text-xl py-3 hover:text-amber-400 transition-colors">Logout</a>
@@ -103,7 +121,7 @@
                     <h4 class="font-semibold mb-4">Explore</h4>
                     <div class="space-y-2 text-slate-400 text-sm">
                         <a href="{% url 'browse' %}" class="block hover:text-white transition-colors">Browse</a>
-                        <a href="{% url 'home' %}" class="block hover:text-white transition-colors">Top Rated</a>
+                        <a href="{% url 'top_rated' %}" class="block hover:text-white transition-colors">Top Rated</a>
                     </div>
                 </div>
                 <div>
@@ -133,5 +151,55 @@
     </footer>
 
     <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- Fallback inline script if external file doesn't load -->
+    <script>
+        // Ensure functions are available globally
+        if (typeof toggleUserMenu === 'undefined') {
+            console.warn('External JS not loaded, using inline fallback');
+            
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                if (menu) menu.classList.toggle('active');
+            }
+            
+            function toggleUserMenu() {
+                const menu = document.getElementById('userMenu');
+                if (menu) {
+                    menu.classList.toggle('hidden');
+                    console.log('Menu toggled');
+                }
+            }
+            
+            function toggleAdvancedSearch() {
+                const advancedSearch = document.getElementById('advancedSearch');
+                if (advancedSearch) advancedSearch.classList.toggle('hidden');
+            }
+        }
+        
+        // Close menus when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const advancedSearch = document.getElementById('advancedSearch');
+            
+            if (userMenu && !event.target.closest('[onclick*="toggleUserMenu"]') && !event.target.closest('#userMenu')) {
+                userMenu.classList.add('hidden');
+            }
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!event.target.closest('.mobile-menu') && !event.target.closest('[onclick*="toggleMobileMenu"]')) {
+                    mobileMenu.classList.remove('active');
+                }
+            }
+            
+            if (advancedSearch && !advancedSearch.classList.contains('hidden')) {
+                if (!event.target.closest('#advancedSearch') && !event.target.closest('[onclick*="toggleAdvancedSearch"]')) {
+                    advancedSearch.classList.add('hidden');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
+

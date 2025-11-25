@@ -1,3 +1,6 @@
+<!-- ============================================ -->
+<!-- movies/templates/movies/home.html -->
+<!-- ============================================ -->
 {% extends 'movies/base.html' %}
 
 {% block title %}Home - The Cinematic{% endblock %}
@@ -36,8 +39,7 @@
         Trending Now
     </h2>
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        <!--
-        {% for movie in trending_movies %} -->
+        {% for movie in trending_movies %}
         <a href="{% url 'movie_detail' movie.id %}" class="movie-card group cursor-pointer relative overflow-hidden rounded-lg bg-slate-800">
             <div class="aspect-[2/3] relative overflow-hidden">
                 {% if movie.poster %}

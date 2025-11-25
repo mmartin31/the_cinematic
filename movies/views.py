@@ -1,3 +1,7 @@
+# ============================================
+# movies/views.py
+# ============================================
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
@@ -29,7 +33,7 @@ def browse(request):
     search_query = request.GET.get('search', '')
     if search_query:
         movies = movies.filter(
-            Q(title__icontains=search_query) |
+            Q(series_title__icontains=search_query) |
             Q(overview__icontains=search_query)
         )
     
@@ -39,9 +43,23 @@ def browse(request):
         movies = movies.filter(genres__name=genre_filter)
     
     # Year filter
-    year_filter = request.GET.get('released_year', '')
+    year_filter = request.GET.get('year', '')
     if year_filter:
-        movies = movies.filter(year=year_filter)
+        movies = movies.filter(released_year=year_filter)
+    
+    # Sort filter
+    sort_by = request.GET.get('sort', '')
+    if sort_by == 'rating':
+        movies = movies.order_by('-average_rating', '-created_at')
+    elif sort_by == 'recent':
+        movies = movies.order_by('-created_at')
+    elif sort_by == 'year':
+        movies = movies.order_by('-released_year', 'title')
+    else:
+        movies = movies.order_by('-created_at')
+    
+    # Remove duplicates if filtering by genre
+    movies = movies.distinct()
     
     # Get unique years for filter
     years = Movie.objects.values_list('released_year', flat=True).distinct().order_by('-released_year')
@@ -53,8 +71,37 @@ def browse(request):
         'search_query': search_query,
         'selected_genre': genre_filter,
         'selected_year': year_filter,
+        'sort_by': sort_by,
     }
     return render(request, 'movies/browse.html', context)
+
+
+def top_rated(request):
+    """Top rated movies page with leaderboard"""
+    # Get all movies ordered by rating
+    all_movies = Movie.objects.filter(
+        average_rating__gt=0
+    ).order_by('-average_rating', '-created_at')
+    
+    # Genre filter
+    genres = Genre.objects.all()
+    genre_filter = request.GET.get('genre', '')
+    if genre_filter:
+        all_movies = all_movies.filter(genres__name=genre_filter)
+    
+    # Get top 10 for podium
+    top_10 = all_movies[:10]
+    
+    # Get the rest for the leaderboard
+    rest_movies = all_movies[10:]
+    
+    context = {
+        'top_10': top_10,
+        'rest_movies': rest_movies,
+        'genres': genres,
+        'selected_genre': genre_filter,
+    }
+    return render(request, 'movies/top_rated.html', context)
 
 
 def movie_detail(request, movie_id):
