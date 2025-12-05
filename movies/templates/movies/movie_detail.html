@@ -1,4 +1,7 @@
 {% extends 'movies/base.html' %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+<script src="{% static 'js/main.js' %}"></script>
 
 {% block title %}{{ movie.title }} - The Cinematic{% endblock %}
 

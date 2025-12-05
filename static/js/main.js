@@ -55,20 +55,31 @@ document.addEventListener('click', function(event) {
 
 // Create star rating component for movie detail page
 function createMovieRating(containerId, initialRating, csrfToken, movieId) {
+    console.log('createMovieRating called with:', { containerId, initialRating, csrfToken, movieId });
     const container = document.getElementById(containerId);
     const ratingText = document.getElementById('ratingText');
     
-    if (!container) return;
+    console.log('Container found:', !!container);
+    console.log('RatingText found:', !!ratingText);
     
-    let currentRating = initialRating;
+    if (!container) {
+        console.error('Container element not found:', containerId);
+        return;
+    }
+    
+    let currentRating = parseInt(initialRating, 10) || 0;
     let hoverRating = 0;
     
-    // Create 5 stars
+    // Create 5 stars using Unicode characters
     for (let i = 1; i <= 5; i++) {
-        const star = document.createElement('svg');
-        star.className = 'star w-8 h-8';
-        star.setAttribute('viewBox', '0 0 24 24');
-        star.innerHTML = '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>';
+        const star = document.createElement('span');
+        star.className = 'star';
+        star.textContent = '☆'; // Empty star
+        star.style.fontSize = '32px';
+        star.style.cursor = 'pointer';
+        star.style.marginRight = '8px';
+        star.style.display = 'inline-block';
+        star.style.userSelect = 'none';
         
         // Add hover effect
         star.addEventListener('mouseenter', () => {
@@ -98,9 +109,11 @@ function createMovieRating(containerId, initialRating, csrfToken, movieId) {
         
         stars.forEach((star, index) => {
             if (index < rating) {
-                star.classList.add('filled');
+                star.textContent = '★'; // Filled star
+                star.style.color = '#fbbf24';
             } else {
-                star.classList.remove('filled');
+                star.textContent = '☆'; // Empty star
+                star.style.color = '#64748b';
             }
         });
         

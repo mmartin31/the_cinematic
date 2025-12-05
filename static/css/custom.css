@@ -196,25 +196,32 @@ img[class*="hover"] {
 
 .star-rating {
     display: inline-flex;
-    gap: 0.25rem;
+    gap: 0.5rem;
     align-items: center;
 }
 
 .star {
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #475569;
+    color: #64748b;
     fill: transparent;
+    stroke: #64748b;
+    stroke-width: 2;
+    flex-shrink: 0;
 }
 
 .star.filled {
     color: #fbbf24;
     fill: #fbbf24;
+    stroke: #f59e0b;
     filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4));
 }
 
 .star:hover {
-    transform: scale(1.15);
+    color: #fbbf24;
+    stroke: #fbbf24;
+    fill: rgba(251, 191, 36, 0.3);
+    transform: scale(1.2);
     filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.6));
 }
 
