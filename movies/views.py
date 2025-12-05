@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count
 from django.http import JsonResponse
 from .models import Movie, Genre, Rating, UserProfile
 from .forms import RatingForm, UserProfileForm
@@ -78,10 +78,12 @@ def browse(request):
 
 def top_rated(request):
     """Top rated movies page with leaderboard"""
-    # Get all movies ordered by rating
+    # Get all movies ordered by rating, with tiebreakers
     all_movies = Movie.objects.filter(
         average_rating__gt=0
-    ).order_by('-average_rating', '-created_at')
+    ).annotate(
+        rating_count=Count('ratings')
+    ).order_by('-average_rating', '-rating_count', '-released_year')
     
     # Genre filter
     genres = Genre.objects.all()
